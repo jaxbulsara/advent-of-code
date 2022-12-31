@@ -8,6 +8,9 @@ language: en
 
 # 2022, Day 1, Part 1
 
+[View code
+here.](https://github.com/jaxbulsara/advent-of-code/tree/main/2022/01/01)
+
 This is my first foray into the world of Advent of Code since a friend of mine
 introduced it to me. I started doing a problem that she was stuck on in Python
 and I really enjoyed it. But I can do all of these problems in Python and
@@ -128,6 +131,13 @@ functional strength modules.
 
 ## Elixir Solution
 
+[View code here.](
+https://github.com/jaxbulsara/advent-of-code/tree/main/2022/01/01/elixir-advent
+)
+
 I have no clear idea on how to approach this since all I've done with elixir is
 a few exercises and read about it. Guess the best thing to do is take it step
 by step. Lucky for me, I have the steps listed out above.
+
+I guess the best way to go about this is to use `mix new` to set up a new
+project.
