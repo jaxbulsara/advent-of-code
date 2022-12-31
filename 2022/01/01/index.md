@@ -6,7 +6,7 @@ tags: advent-of-code, elixir
 language: en
 ---
 
-# Advent of Code - 2022/01/01
+# 2022, Day 1, Part 1
 
 This is my first foray into the world of Advent of Code since a friend of mine
 introduced it to me. I started doing a problem that she was stuck on in Python
