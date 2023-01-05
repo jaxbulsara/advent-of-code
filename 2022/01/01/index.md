@@ -499,4 +499,56 @@ step-by-step.
 
 ### D. Find highest calorie sum
 
+[`Enum.max/3`](https://hexdocs.pm/elixir/Enum.html#max/3) will do the trick:
+
+```elixir
+iex(1)> Enum.max([7, 3, 5])
+7
+```
+
 ### E. Print highest calorie sum
+
+Lastly, [`IO.puts/2`](https://hexdocs.pm/elixir/IO.html#puts/2):
+
+```elixir
+iex(2)> IO.puts(7)
+7
+:ok
+```
+
+### Writing the main function
+
+Now that we have all of the individual functions we need, we can write the main
+function, which will just be a pipe through each one.
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+defmodule ElixirAdvent do
+  def solve(filename) do
+    {:ok, input} = File.read(filename)
+
+    input
+    |> String.split("\n")
+    |> create_calorie_lists()
+    |> sum_calorie_groups()
+    |> Enum.max()
+    |> IO.puts()
+  end
+
+  ...
+end
+```
+
+To run the script, I'll enter `iex` with `iex -S mix` to load the project.
+
+```elixir
+ex(4)> recompile
+Compiling 1 file (.ex)
+:ok
+iex(5)> ElixirAdvent.solve("input.txt")
+69281
+:ok
+```
+
+And the answer, for my input, is `69281`!

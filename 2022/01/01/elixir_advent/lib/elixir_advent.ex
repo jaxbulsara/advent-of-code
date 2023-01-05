@@ -1,4 +1,15 @@
 defmodule ElixirAdvent do
+  def solve(filename) do
+    {:ok, input} = File.read(filename)
+
+    input
+    |> String.split("\n")
+    |> create_calorie_lists()
+    |> sum_calorie_groups()
+    |> Enum.max()
+    |> IO.puts()
+  end
+
   def create_calorie_lists(input) do
     calorie_list = []
 
