@@ -552,3 +552,30 @@ iex(5)> ElixirAdvent.solve("input.txt")
 ```
 
 And the answer, for my input, is `69281`!
+
+### Afterthoughts
+
+After browsing through [`Enum`](https://hexdocs.pm/elixir/Enum.html#content), I
+noticed [`Enum.map/2`](https://hexdocs.pm/elixir/Enum.html#map/2) which I can
+use to replace my `sum_calorie_groups` function:
+
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 8
+defmodule ElixirAdvent do
+  def solve(filename) do
+    {:ok, input} = File.read(filename)
+
+    input
+    |> String.split("\n")
+    |> create_calorie_lists()
+    |> Enum.map(fn group -> Enum.sum(group) end)
+    |> Enum.max()
+    |> IO.puts()
+  end
+
+  ...
+end
+```
