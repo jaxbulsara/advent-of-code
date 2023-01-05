@@ -141,3 +141,297 @@ by step. Lucky for me, I have the steps listed out above.
 
 I guess the best way to go about this is to use `mix new` to set up a new
 project.
+
+Now to write each module.
+
+### A. Read input file into memory
+
+I'll just use the builtin
+[`File.read/1`](https://hexdocs.pm/elixir/File.html#read/1) to read the input.
+
+```elixir
+iex(1)> File.read "input.txt"
+{:ok, "9195\n5496\n2732\n8364\n3703\n3199\n ... " <> ...}
+```
+
+### B. Parse input into a list of calorie lists
+
+Originally, I was thinking of using a `for` loop, but as I got into it, it was
+getting kind of unwieldy even for something really simple like this. Then I
+remembered that that's not what you do in functional languages if you can help
+it.
+
+So really, this step will need to be performed recursively and in two steps:
+
+```{mermaid}
+graph TD
+  A --> B
+  A[Transform input into a list of lines]
+  B[Parse input list into a list of calorie lists]
+```
+
+For the first step,
+[`String.split/3`](https://hexdocs.pm/elixir/String.html#split/3) will do:
+
+```elixir
+iex(3)> String.split "123\n234\n345\n", "\n"
+["123", "234", "345", ""]
+```
+
+Then, I'll need to write a recursive function to transform that list of strings
+into a list of calorie lists. I'll need to use one builtin function,
+[`String.to_integer/1`](https://hexdocs.pm/elixir/String.html#to_integer/1)
+
+```elixir
+iex(4)> String.to_integer "123"
+123
+```
+
+I'll write a test for my function, `create_calorie_lists/1`, which takes the
+list from the previous step. I'll assume that the first and last lines are
+always populated:
+
+```{code-block} elixir
+:linenos:
+:caption: test/elixir_advent_test.exs
+test "parses input list of strings into a list of calorie lists" do
+  input = ["1", "2", "3", "", "3", "4", "5"]
+
+  expected = [[1, 2, 3], [3, 4, 5]]
+  assert ElixirAdvent.create_calorie_lists(input) == expected
+end
+```
+
+First test run got an error: `** (UndefinedFunctionError) function
+ElixirAdvent.create_calorie_lists/1 is undefined or private`. I need to create
+the function definition in my module:
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+defmodule ElixirAdvent do
+  def create_calorie_lists(input) do
+
+  end
+end
+```
+
+Now I can start writing the actual function. The first definition seems to be
+just the entry point, because I will eventually need a second argument that
+holds the calorie lists. Something like this:
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 2, 5-7
+  def create_calorie_lists(input) do
+    _create_calorie_lists(input, [])
+  end
+
+  defp _create_calorie_lists([line | input], []) do
+
+  end
+```
+
+Here, I need to start defining each function clause by its input match. I'll
+just list out my cases:
+
+- `input`: Start the calorie list creation process with an empty list.
+- `[line | input], []`: Create a new sub-list with `line` and add it to the
+    calorie list.
+- `["" | input], [calorie_group | calorie_tail]`: Create a new empty calorie
+    group and join it to the calorie list.
+- `[line | input], [calorie_group | calorie_tail]`: Add `line` to
+    `calorie_group`
+- `[] | calorie_list`: When the input is depleted, return the calorie list.
+
+And I get the following code:
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 7, 10-28
+defmodule ElixirAdvent do
+  def create_calorie_lists(input) do
+    _create_calorie_lists(input, [])
+  end
+
+  defp _create_calorie_lists([line | input], []) do
+    _create_calorie_lists(input, [[_to_calories(line)]])
+  end
+
+  defp _create_calorie_lists(["" | input], calorie_list) do
+    _create_calorie_lists(input, [[] | calorie_list])
+  end
+
+  defp _create_calorie_lists([line | input], [calorie_group | calorie_tail]) do
+    _create_calorie_lists(
+      input,
+      [[_to_calories(line) | calorie_group] | calorie_tail]
+    )
+  end
+
+  defp _create_calorie_lists([], calorie_list) do
+    calorie_list
+  end
+
+  defp _to_calories(line) do
+    String.to_integer(line)
+  end
+end
+```
+
+Which surprisingly fails, but because the calorie lists are in the reverse
+order! I didn't consider that appending heads would result in reversed lists.
+
+```
+    code:  assert ElixirAdvent.create_calorie_lists(input) == expected
+    left:  [[5, 4, 3], [3, 2, 1]]
+    right: [[1, 2, 3], [3, 4, 5]]
+    stacktrace:
+      test/elixir_advent_test.exs:9: (test)
+```
+
+I'll try [`Enum.reverse/1`](https://hexdocs.pm/elixir/Enum.html#reverse/1) to
+get the lists in the correct order. Whenever a group is complete, I'll have to
+reverse it. And then I'll have to reverse the whole list at the end:
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 11-13, 24
+defmodule ElixirAdvent do
+
+  def create_calorie_lists(input) do
+    _create_calorie_lists(input, [])
+  end
+
+  defp _create_calorie_lists([line | input], []) do
+    _create_calorie_lists(input, [[_to_calories(line)]])
+  end
+
+  defp _create_calorie_lists(["" | input], [calorie_group | calorie_tail]) do
+    calorie_group = Enum.reverse(calorie_group)
+    _create_calorie_lists(input, [[] | [calorie_group | calorie_tail]])
+  end
+
+  defp _create_calorie_lists([line | input], [calorie_group | calorie_tail]) do
+    _create_calorie_lists(
+      input,
+      [[_to_calories(line) | calorie_group] | calorie_tail]
+    )
+  end
+
+  defp _create_calorie_lists([], calorie_list) do
+    Enum.reverse(calorie_list)
+  end
+
+  defp _to_calories(line) do
+    String.to_integer(line)
+  end
+end
+```
+
+And I get a new error, where the last group remains unreversed:
+
+```
+     code:  assert ElixirAdvent.create_calorie_lists(input) == expected
+     left:  [[1, 2, 3], [5, 4, 3]]
+     right: [[1, 2, 3], [3, 4, 5]]
+     stacktrace:
+       test/elixir_advent_test.exs:9: (test)
+
+```
+
+Looks like in the last step, I need to reverse the head and then the whole
+list:
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 22-24
+defmodule ElixirAdvent do
+  def create_calorie_lists(input) do
+    _create_calorie_lists(input, [])
+  end
+
+  defp _create_calorie_lists([line | input], []) do
+    _create_calorie_lists(input, [[_to_calories(line)]])
+  end
+
+  defp _create_calorie_lists(["" | input], [calorie_group | calorie_tail]) do
+    calorie_group = Enum.reverse(calorie_group)
+    _create_calorie_lists(input, [[] | [calorie_group | calorie_tail]])
+  end
+
+  defp _create_calorie_lists([line | input], [calorie_group | calorie_tail]) do
+    _create_calorie_lists(
+      input,
+      [[_to_calories(line) | calorie_group] | calorie_tail]
+    )
+  end
+
+  defp _create_calorie_lists([], [calorie_group | calorie_tail]) do
+    calorie_group = Enum.reverse(calorie_group)
+    Enum.reverse([calorie_group | calorie_tail])
+  end
+
+  defp _to_calories(line) do
+    String.to_integer(line)
+  end
+end
+```
+
+Now my test is passing, so I can refactor the code a little:
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 3-5, 9-12, 16-20, 24-27, 31-34
+defmodule ElixirAdvent do
+  def create_calorie_lists(input) do
+    calorie_list = []
+
+    _create_calorie_lists(input, calorie_list)
+  end
+
+  defp _create_calorie_lists([line | input], []) do
+    calorie_group = [_to_calories(line)]
+    calorie_list = [calorie_group]
+
+    _create_calorie_lists(input, calorie_list)
+  end
+
+  defp _create_calorie_lists(["" | input], [calorie_group | calorie_tail]) do
+    calorie_group = Enum.reverse(calorie_group)
+    calorie_list = [calorie_group | calorie_tail]
+    calorie_list = [[] | calorie_list]
+
+    _create_calorie_lists(input, calorie_list)
+  end
+
+  defp _create_calorie_lists([line | input], [calorie_group | calorie_tail]) do
+    calorie_group = [_to_calories(line) | calorie_group]
+    calorie_list = [calorie_group | calorie_tail]
+
+    _create_calorie_lists(input, calorie_list)
+  end
+
+  defp _create_calorie_lists([], [calorie_group | calorie_tail]) do
+    calorie_group = Enum.reverse(calorie_group)
+    calorie_list = Enum.reverse([calorie_group | calorie_tail])
+
+    calorie_list
+  end
+
+  defp _to_calories(line) do
+    String.to_integer(line)
+  end
+end
+```
+
+### C. Calculate calorie sum for each elf #
+
+### D. Find highest calorie sum
+
+### E. Print highest calorie sum
