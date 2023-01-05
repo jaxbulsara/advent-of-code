@@ -432,6 +432,71 @@ end
 
 ### C. Calculate calorie sum for each elf #
 
+This should be a bit easier. All I need to do is iterate through the list and
+add up each group. Then remember to reverse the list at the end.
+
+I'll write my test for `sum_calorie_groups`:
+
+```{code-block} elixir
+:linenos:
+:caption: test/elixir_advent_test.exs
+defmodule ElixirAdventTest do
+  use ExUnit.Case
+  doctest ElixirAdvent
+
+  ...
+
+  test "sums each calorie group" do
+    input = [[1, 2, 3], [3, 4, 5]]
+
+    expected = [6, 12]
+    assert ElixirAdvent.sum_calorie_groups(input) == expected
+  end
+end
+```
+
+Then I'll write the function. Here I wrote each case in order, starting from
+the first case, with an empty sums list, through to the end, where I need to
+reverse the final list.
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+defmodule ElixirAdvent do
+  ...
+
+  def sum_calorie_groups(input) do
+    calorie_sums = []
+
+    _sum_calorie_groups(input, calorie_sums)
+  end
+
+  def _sum_calorie_groups([calorie_group | calorie_tail], []) do
+    sum = Enum.sum(calorie_group)
+    calorie_sums = [sum]
+
+    _sum_calorie_groups(calorie_tail, calorie_sums)
+  end
+
+  def _sum_calorie_groups([calorie_group | calorie_tail], calorie_sums) do
+    sum = Enum.sum(calorie_group)
+    calorie_sums = [sum | calorie_sums]
+
+    _sum_calorie_groups(calorie_tail, calorie_sums)
+  end
+
+  def _sum_calorie_groups([], calorie_sums) do
+    calorie_sums = Enum.reverse(calorie_sums)
+
+    calorie_sums
+  end
+end
+```
+
+Which passes easily. Though it looks like so much code for something as simple
+as iterating through a list. But it is fun to write these things explicitly
+step-by-step.
+
 ### D. Find highest calorie sum
 
 ### E. Print highest calorie sum
