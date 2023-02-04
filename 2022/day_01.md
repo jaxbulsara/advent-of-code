@@ -578,6 +578,24 @@ defmodule ElixirAdvent do
   ...
 end
 ```
+### Rust Solution
+
+I'm writing this after I finished part 2 of the Elixir solution. I'm not very
+confident in my Rust coding abilities, but I'm gonna do my best.
+
+#### A. Read input file into memory
+
+To read the file, I'll use [`std::fs.read_to_string()`](https://doc.rust-lang.org/std/fs/fn.read_to_string.html).
+
+```{code-block} rust
+:linenos:
+:caption: src/main.rs
+use std::fs;
+
+fn main() {
+    let contents = fs::read_to_string("input.txt").expect("Could not read input file.");
+}
+```
 
 ## Part 2
 
