@@ -621,7 +621,7 @@ groups. So I'll write a test, copied from the elixir solution:
 ```{code-block} rust
 :linenos:
 :caption: src/main.rs
-...
+// ...
 fn create_calorie_lists(lines: Vec<&str>) -> Vec<Vec<i32>> {
     let mut calorie_list: Vec<Vec<i32>> = Vec::new();
     let mut calorie_group: Vec<i32> = Vec::new();
@@ -663,6 +663,42 @@ This was the hardest thing I've ever done. The rust compiler beat me until I
 understood borrowing. So now I understand borrowing. And shadowing. Thanks rust
 compiler.
 
+#### C. Calculate calorie sum for each elf #
+
+As it turns out, we won't need to know the index of each elf, but that doesn't
+really change anything for me. I will have to write my own function in Rust,
+since I probably can't do the cool inline function thing that Elixir can do:
+
+
+```{code-block} rust
+:linenos:
+:caption: src/main.rs
+// ...
+
+fn sum_calorie_groups(calorie_list: Vec<Vec<i32>>) -> Vec<i32> {
+    let mut calorie_sums: Vec<i32> = Vec::new();
+    for group in calorie_list {
+        let sum: i32 = group.iter().sum();
+        calorie_sums.push(sum);
+    }
+
+    calorie_sums
+}
+
+#[cfg(test)]
+mod tests {
+    // ...
+    #[test]
+    fn test_sum_calorie_groups() {
+        let input = vec![vec![1, 2, 3], vec![3, 4, 5]];
+        let expected = vec![6, 12];
+        assert_eq!(super::sum_calorie_groups(input), expected);
+    }
+}
+```
+
+That wasn't nearly as hard as the last function, now that I know how to
+ownership kinda works.
 
 ## Part 2
 
