@@ -666,39 +666,69 @@ compiler.
 #### C. Calculate calorie sum for each elf #
 
 As it turns out, we won't need to know the index of each elf, but that doesn't
-really change anything for me. I will have to write my own function in Rust,
-since I probably can't do the cool inline function thing that Elixir can do:
-
+really change anything for me. I ended up doing the same thing I did during the
+elixir solution; writing my own summing function and then realizing I can use a
+map. I used
+[`iter()`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.iter),
+[`map()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.map),
+[`sum()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.sum),
+and
+[`collect()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.collect).
 
 ```{code-block} rust
 :linenos:
 :caption: src/main.rs
+:emphasize-lines: 7-11
+use std::cmp;
+use std::fs;
+
+fn main() {
+    let contents = fs::read_to_string("input.txt").expect("Could not read input file.");
+    let lines: Vec<&str> = contents.split("\n").collect();
+    let calorie_groups = create_calorie_groups(lines);
+    let calorie_sums: Vec<i32> = calorie_groups
+        .iter()
+        .map(|group| group.iter().sum())
+        .collect();
+}
 // ...
-
-fn sum_calorie_groups(calorie_list: Vec<Vec<i32>>) -> Vec<i32> {
-    let mut calorie_sums: Vec<i32> = Vec::new();
-    for group in calorie_list {
-        let sum: i32 = group.iter().sum();
-        calorie_sums.push(sum);
-    }
-
-    calorie_sums
-}
-
-#[cfg(test)]
-mod tests {
-    // ...
-    #[test]
-    fn test_sum_calorie_groups() {
-        let input = vec![vec![1, 2, 3], vec![3, 4, 5]];
-        let expected = vec![6, 12];
-        assert_eq!(super::sum_calorie_groups(input), expected);
-    }
-}
 ```
 
-That wasn't nearly as hard as the last function, now that I know how to
-ownership kinda works.
+#### D. Find highest calorie sum
+
+Now I need a function that will find the highest calorie sum in my vector. I used
+[`iter()`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.iter),
+[`reduce()`](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.reduce),
+[`std::cmp::max()`](https://doc.rust-lang.org/std/cmp/fn.max.html), and
+[`unwrap()`](https://doc.rust-lang.org/std/option/enum.Option.html#method.unwrap)
+to find the highest calorie sum.
+
+I went ahead and printed the result as well, which completes the solution, and
+I got the same answer as before, `69281`.
+
+```{code-block} rust
+:linenos:
+:caption: src/main.rs
+:emphasize-lines: 12-16
+use std::cmp;
+use std::fs;
+
+fn main() {
+    let contents = fs::read_to_string("input.txt").expect("Could not read input file.");
+    let lines: Vec<&str> = contents.split("\n").collect();
+    let calorie_groups = create_calorie_groups(lines);
+    let calorie_sums: Vec<i32> = calorie_groups
+        .iter()
+        .map(|group| group.iter().sum())
+        .collect();
+    let max_calorie_sum = calorie_sums
+        .iter()
+        .reduce(|acc, e| cmp::max(acc, e))
+        .unwrap();
+    println!("{:?}", max_calorie_sum);
+}
+// ...
+```
 
 ## Part 2
 

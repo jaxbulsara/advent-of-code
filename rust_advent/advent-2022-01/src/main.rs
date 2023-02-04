@@ -1,59 +1,53 @@
+use std::cmp;
 use std::fs;
 
 fn main() {
     let contents = fs::read_to_string("input.txt").expect("Could not read input file.");
     let lines: Vec<&str> = contents.split("\n").collect();
+    let calorie_groups = create_calorie_groups(lines);
+    let calorie_sums: Vec<i32> = calorie_groups
+        .iter()
+        .map(|group| group.iter().sum())
+        .collect();
+    let max_calorie_sum = calorie_sums
+        .iter()
+        .reduce(|acc, e| cmp::max(acc, e))
+        .unwrap();
+    println!("{:?}", max_calorie_sum);
 }
 
-fn create_calorie_lists(lines: Vec<&str>) -> Vec<Vec<i32>> {
-    let mut calorie_list: Vec<Vec<i32>> = Vec::new();
-    let mut calorie_group: Vec<i32> = Vec::new();
+fn create_calorie_groups(lines: Vec<&str>) -> Vec<Vec<i32>> {
+    let mut calorie_groups: Vec<Vec<i32>> = Vec::new();
+    let mut group: Vec<i32> = Vec::new();
 
     for line in lines {
         match line {
             "" => {
-                calorie_list.push(calorie_group);
-                calorie_group = Vec::new();
+                calorie_groups.push(group);
+                group = Vec::new();
             }
             _ => {
                 let calories = line
                     .parse::<i32>()
                     .expect("Calorie value must be an integer.");
-                calorie_group.push(calories);
+                group.push(calories);
             }
         }
     }
 
-    if !calorie_group.is_empty() {
-        calorie_list.push(calorie_group);
+    if !group.is_empty() {
+        calorie_groups.push(group);
     }
 
-    calorie_list
-}
-
-fn sum_calorie_groups(calorie_list: Vec<Vec<i32>>) -> Vec<i32> {
-    let mut calorie_sums: Vec<i32> = Vec::new();
-    for group in calorie_list {
-        let sum: i32 = group.iter().sum();
-        calorie_sums.push(sum);
-    }
-
-    calorie_sums
+    calorie_groups
 }
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn test_create_calorie_list() {
+    fn test_create_calorie_groups() {
         let input = vec!["1", "2", "3", "", "3", "4", "5"];
         let expected = vec![vec![1, 2, 3], vec![3, 4, 5]];
-        assert_eq!(super::create_calorie_lists(input), expected);
-    }
-
-    #[test]
-    fn test_sum_calorie_groups() {
-        let input = vec![vec![1, 2, 3], vec![3, 4, 5]];
-        let expected = vec![6, 12];
-        assert_eq!(super::sum_calorie_groups(input), expected);
+        assert_eq!(super::create_calorie_groups(input), expected);
     }
 }
