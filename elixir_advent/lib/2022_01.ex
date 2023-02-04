@@ -1,6 +1,6 @@
-defmodule ElixirAdvent do
-  def solve(filename) do
-    {:ok, input} = File.read(filename)
+defmodule ElixirAdvent.P202201 do
+  def part1() do
+    {:ok, input} = File.read("input_2022_01_01.txt")
 
     input
     |> String.split("\n")

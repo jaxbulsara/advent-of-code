@@ -6,10 +6,9 @@ tags: advent-of-code, elixir
 language: en
 ---
 
-# 2022, Day 1, Part 1
+# 2022: Day 1
 
-[View code
-here.](https://github.com/jaxbulsara/advent-of-code/tree/main/2022/01/01)
+## Part 1
 
 This is my first foray into the world of Advent of Code since a friend of mine
 introduced it to me. I started doing a problem that she was stuck on in Python
@@ -26,7 +25,7 @@ which makes builds and deployments really fast and seamless, so I'm going to be
 posting all of these thoughts on my blog at
 [jaybulsara.dev](https://jaybulsara.dev/).
 
-## Problem Statement
+### Problem Statement
 
 --- Day 1: Calorie Counting ---
 
@@ -98,7 +97,7 @@ Elf carrying the most Calories. In the example above, this is 24000
 Find the Elf carrying the most Calories. How many total Calories is that Elf
 carrying?
 
-## Composite Analysis
+### Composite Analysis
 
 ```{note}
 If you're not familiar with composite analysis, read [*Reliable Software
@@ -129,7 +128,7 @@ graph TD
 I don't think I even need to do the decomposition since all of these look like
 functional strength modules.
 
-## Elixir Solution
+### Elixir Solution
 
 [View code here.](
 https://github.com/jaxbulsara/advent-of-code/tree/main/2022/01/01/elixir-advent
@@ -144,7 +143,7 @@ project.
 
 Now to write each module.
 
-### A. Read input file into memory
+#### A. Read input file into memory
 
 I'll just use the builtin
 [`File.read/1`](https://hexdocs.pm/elixir/File.html#read/1) to read the input.
@@ -154,7 +153,7 @@ iex(1)> File.read "input.txt"
 {:ok, "9195\n5496\n2732\n8364\n3703\n3199\n ... " <> ...}
 ```
 
-### B. Parse input into a list of calorie lists
+#### B. Parse input into a list of calorie lists
 
 Originally, I was thinking of using a `for` loop, but as I got into it, it was
 getting kind of unwieldy even for something really simple like this. Then I
@@ -430,7 +429,7 @@ defmodule ElixirAdvent do
 end
 ```
 
-### C. Calculate calorie sum for each elf #
+#### C. Calculate calorie sum for each elf #
 
 This should be a bit easier. All I need to do is iterate through the list and
 add up each group. Then remember to reverse the list at the end.
@@ -497,7 +496,7 @@ Which passes easily. Though it looks like so much code for something as simple
 as iterating through a list. But it is fun to write these things explicitly
 step-by-step.
 
-### D. Find highest calorie sum
+#### D. Find highest calorie sum
 
 [`Enum.max/3`](https://hexdocs.pm/elixir/Enum.html#max/3) will do the trick:
 
@@ -506,7 +505,7 @@ iex(1)> Enum.max([7, 3, 5])
 7
 ```
 
-### E. Print highest calorie sum
+#### E. Print highest calorie sum
 
 Lastly, [`IO.puts/2`](https://hexdocs.pm/elixir/IO.html#puts/2):
 
@@ -516,7 +515,7 @@ iex(2)> IO.puts(7)
 :ok
 ```
 
-### Writing the main function
+#### Writing the main function
 
 Now that we have all of the individual functions we need, we can write the main
 function, which will just be a pipe through each one.
@@ -553,7 +552,7 @@ iex(5)> ElixirAdvent.solve("input.txt")
 
 And the answer, for my input, is `69281`!
 
-### Afterthoughts
+#### Afterthoughts
 
 After browsing through [`Enum`](https://hexdocs.pm/elixir/Enum.html#content), I
 noticed [`Enum.map/2`](https://hexdocs.pm/elixir/Enum.html#map/2) which I can

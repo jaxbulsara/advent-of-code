@@ -1,5 +1,6 @@
-defmodule ElixirAdventTest do
+defmodule ElixirAdventTest.P202201 do
   use ExUnit.Case
+  alias ElixirAdvent.P202201, as: ElixirAdvent
   doctest ElixirAdvent
 
   test "parses input list of strings into a list of calorie lists" do
