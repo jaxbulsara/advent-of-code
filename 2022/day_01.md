@@ -597,6 +597,73 @@ fn main() {
 }
 ```
 
+#### B. Parse input into a list of calorie lists
+
+In Rust, I'm going to use regular iteration. First, I need to split the file
+content into a vector of line strings:
+
+
+```{code-block} rust
+:linenos:
+:caption: src/main.rs
+:emphasize-lines: 5
+use std::fs;
+
+fn main() {
+    let contents = fs::read_to_string("input.txt").expect("Could not read input file.");
+    let lines: Vec<&str> = contents.split("\n").collect();
+}
+```
+
+Then I need a function that will convert that vector into a vector of calorie
+groups. So I'll write a test, copied from the elixir solution:
+
+```{code-block} rust
+:linenos:
+:caption: src/main.rs
+...
+fn create_calorie_lists(lines: Vec<&str>) -> Vec<Vec<i32>> {
+    let mut calorie_list: Vec<Vec<i32>> = Vec::new();
+    let mut calorie_group: Vec<i32> = Vec::new();
+
+    for line in lines {
+        match line {
+            "" => {
+                calorie_list.push(calorie_group);
+                calorie_group = Vec::new();
+            }
+            _ => {
+                let calories = line
+                    .parse::<i32>()
+                    .expect("Calorie value must be an integer.");
+                calorie_group.push(calories);
+            }
+        }
+    }
+
+    if !calorie_group.is_empty() {
+        calorie_list.push(calorie_group);
+    }
+
+    calorie_list
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_create_calorie_list() {
+        let input = vec!["1", "2", "3", "", "3", "4", "5"];
+        let expected = vec![vec![1, 2, 3], vec![3, 4, 5]];
+        assert_eq!(super::create_calorie_lists(input), expected);
+    }
+}
+```
+
+This was the hardest thing I've ever done. The rust compiler beat me until I
+understood borrowing. So now I understand borrowing. And shadowing. Thanks rust
+compiler.
+
+
 ## Part 2
 
 After long hiatus, I'm finally starting on part 2 of day 1. Pitiful progress
