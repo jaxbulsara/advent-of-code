@@ -578,3 +578,47 @@ defmodule ElixirAdvent do
   ...
 end
 ```
+
+## Part 2
+
+After long hiatus, I'm finally starting on part 2 of day 1. Pitiful progress
+but progress nonetheless.
+
+### Problem Statement
+
+By the time you calculate the answer to the Elves' question, they've already
+realized that the Elf carrying the most Calories of food might eventually run
+out of snacks.
+
+To avoid this unacceptable situation, the Elves would instead like to know the
+total Calories carried by the top three Elves carrying the most Calories. That
+way, even if one of those Elves runs out of snacks, they still have two
+backups.
+
+In the example above, the top three Elves are the fourth Elf (with 24000
+Calories), then the third Elf (with 11000 Calories), then the fifth Elf (with
+10000 Calories). The sum of the Calories carried by these three elves is 45000.
+
+Find the top three Elves carrying the most Calories. How many Calories are
+those Elves carrying in total?
+
+### Composite Analysis
+
+```{note}
+If you're not familiar with composite analysis, read [*Reliable Software
+through Composite Design* by Glenford J.
+Myers](https://archive.org/details/myers-reliable-software-through-composite-design)
+```
+
+Looks like the first few steps are the same, but instead of finding a single
+max, I'll need to find the sum of the top 3 calorie counts.
+
+```{mermaid}
+graph TD
+    A[Read input file into memory] --> B
+    B[Parse input into a list of calorie lists] -->|Most Abstract Input| C
+    C[Calculate calorie sum for each elf #] --> D
+    D[Get top 3 highest calorie sum] --> |Most Abstract Output| F
+    F[Sum top 3 highest calorie counts] --> E
+    E[Print top 3 highest calorie sum]
+```
