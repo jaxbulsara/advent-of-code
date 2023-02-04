@@ -1,12 +1,26 @@
 defmodule ElixirAdvent.P202201 do
   def part1() do
-    {:ok, input} = File.read("input_2022_01_01.txt")
+    {:ok, input} = File.read("input_2022_01.txt")
 
     input
     |> String.split("\n")
     |> create_calorie_lists()
     |> Enum.map(fn group -> Enum.sum(group) end)
     |> Enum.max()
+    |> IO.puts()
+  end
+
+  def part2() do
+    {:ok, input} = File.read("input_2022_01.txt")
+
+    input
+    |> String.split("\n")
+    |> create_calorie_lists()
+    |> Enum.map(fn group -> Enum.sum(group) end)
+    |> Enum.sort()
+    |> Enum.reverse()
+    |> Enum.take(3)
+    |> Enum.sum()
     |> IO.puts()
   end
 

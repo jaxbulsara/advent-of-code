@@ -564,8 +564,8 @@ use to replace my `sum_calorie_groups` function:
 :caption: lib/elixir_advent.ex
 :emphasize-lines: 8
 defmodule ElixirAdvent do
-  def solve(filename) do
-    {:ok, input} = File.read(filename)
+  def part1() do
+    {:ok, input} = File.read("input_2022_01.txt")
 
     input
     |> String.split("\n")
@@ -622,3 +622,32 @@ graph TD
     F[Sum top 3 highest calorie counts] --> E
     E[Print top 3 highest calorie sum]
 ```
+
+### Elixir Solution
+
+I think I'll just need to make some small changes to the main pipeline.
+
+```{code-block} elixir
+:linenos:
+:caption: lib/elixir_advent.ex
+:emphasize-lines: 10-13
+defmodule ElixirAdvent do
+  ...
+  def part2() do
+    {:ok, input} = File.read("input_2022_01.txt")
+
+    input
+    |> String.split("\n")
+    |> create_calorie_lists()
+    |> Enum.map(fn group -> Enum.sum(group) end)
+    |> Enum.sort()
+    |> Enum.reverse()
+    |> Enum.take(3)
+    |> Enum.sum()
+    |> IO.puts()
+  end
+  ...
+end
+```
+
+That wasn't too hard. My answer is `201524`.
